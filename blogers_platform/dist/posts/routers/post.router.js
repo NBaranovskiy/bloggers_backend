@@ -7,10 +7,11 @@ const createPostHandler_1 = require("./handlers/createPostHandler");
 const getByIdPost_1 = require("./handlers/getByIdPost");
 const updatePostHandler_1 = require("./handlers/updatePostHandler");
 const deletePostHandler_1 = require("./handlers/deletePostHandler");
+const super_admin_guard_middleware_1 = require("../../auth/middlewares/super-admin.guard-middleware");
 exports.postsRouter = (0, express_1.Router)({});
 exports.postsRouter
     .get('', getPostsListHandler_1.getPostsListHandler)
-    .post('', createPostHandler_1.createPostHandler)
+    .post('', super_admin_guard_middleware_1.superAdminGuardMiddleware, createPostHandler_1.createPostHandler)
     .get('/:id', getByIdPost_1.getByIdPost)
-    .put('/:id', updatePostHandler_1.updatePostHandler)
-    .delete('/:id', deletePostHandler_1.deletePostHandler);
+    .put('/:id', super_admin_guard_middleware_1.superAdminGuardMiddleware, updatePostHandler_1.updatePostHandler)
+    .delete('/:id', super_admin_guard_middleware_1.superAdminGuardMiddleware, deletePostHandler_1.deletePostHandler);

@@ -7,10 +7,11 @@ const getBlogsListHandler_1 = require("./handlers/getBlogsListHandler");
 const createBlogHandler_1 = require("./handlers/createBlogHandler");
 const updateBloggerHandler_1 = require("./handlers/updateBloggerHandler");
 const deleteBloggerHandler_1 = require("./handlers/deleteBloggerHandler");
+const super_admin_guard_middleware_1 = require("../../auth/middlewares/super-admin.guard-middleware");
 exports.blogRouter = (0, express_1.Router)({});
 exports.blogRouter
     .get('', getBlogsListHandler_1.getBlogsListHandler)
-    .post('', createBlogHandler_1.createBlogHandler)
+    .post('', super_admin_guard_middleware_1.superAdminGuardMiddleware, createBlogHandler_1.createBlogHandler)
     .get('/:id', getByIdBlogger_1.getByIdBlogger)
-    .put('/:id', updateBloggerHandler_1.updateBloggerHandler)
-    .delete('/:id', deleteBloggerHandler_1.deleteBloggerHandler);
+    .put('/:id', super_admin_guard_middleware_1.superAdminGuardMiddleware, updateBloggerHandler_1.updateBloggerHandler)
+    .delete('/:id', super_admin_guard_middleware_1.superAdminGuardMiddleware, deleteBloggerHandler_1.deleteBloggerHandler);
