@@ -7,19 +7,19 @@ const BlogInputDtoValidation = (data) => {
         typeof data.name !== 'string' ||
         data.name.trim().length < 2 ||
         data.name.trim().length > 15) {
-        errors.push({ field: 'name', message: 'Invalid name' });
+        errors.push({ message: 'Invalid name', field: 'name' });
     }
     if (!data.description ||
         typeof data.description !== 'string' ||
         data.description.trim().length < 2 ||
         data.description.trim().length > 500) {
-        errors.push({ field: 'description', message: 'Invalid description' });
+        errors.push({ message: 'Invalid description', field: 'description' });
     }
     if (!data.websiteUrl ||
         typeof data.websiteUrl !== 'string' ||
         data.websiteUrl.trim().length < 2 ||
         data.websiteUrl.trim().length > 100) {
-        errors.push({ field: 'websiteUrl', message: 'Invalid websiteUrl' });
+        errors.push({ message: 'Invalid websiteUrl', field: 'websiteUrl' });
     }
     return errors;
 };

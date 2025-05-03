@@ -11,7 +11,7 @@ export const PostInputDtoValidation = (data: PostInputDto): ValidationError[] =>
     data.title.trim().length < 2 ||
     data.title.trim().length > 30
   ) {
-    errors.push({ field: 'title', message: 'Invalid title' });
+    errors.push({ message: 'Invalid title',field: 'title' });
   }
   if (
     !data.shortDescription ||
@@ -19,7 +19,7 @@ export const PostInputDtoValidation = (data: PostInputDto): ValidationError[] =>
     data.shortDescription.trim().length < 2 ||
     data.shortDescription.trim().length > 100
   ) {
-    errors.push({ field: 'shortDescription', message: 'Invalid shortDescription' });
+    errors.push({message: 'Invalid shortDescription',field: 'shortDescription'});
   }
   if (
     !data.content ||
@@ -27,13 +27,13 @@ export const PostInputDtoValidation = (data: PostInputDto): ValidationError[] =>
     data.content.trim().length < 2 ||
     data.content.trim().length > 1000
   ) {
-    errors.push({ field: 'content', message: 'Invalid content' });
+    errors.push({ message: 'Invalid content',field: 'content' });
   }
   if (!data.blogId ||
       typeof data.blogId !== 'string' ||
       db.bloggers.findIndex(d => d.id === data.blogId) === -1
   ) {
-    errors.push({ field: 'blogId', message: 'Invalid blogId' });
+    errors.push({  message: 'Invalid blogId',field: 'blogId' });
   }
 
 
