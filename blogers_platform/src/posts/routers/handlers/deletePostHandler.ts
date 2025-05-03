@@ -14,5 +14,5 @@ export function deletePostHandler(
         return;
     };
     db.posts.splice(index,1);
-    res.status(204);
+    res.sendStatus(204);
 };
