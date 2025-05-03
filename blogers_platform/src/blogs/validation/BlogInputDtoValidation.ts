@@ -3,6 +3,8 @@ import { ValidationError } from '../types/ValidationError';
 
 export const BlogInputDtoValidation = (data: BlogInputDto): ValidationError[] => {
   const errors: ValidationError[] = [];
+  const websiteUrlPattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
+
   if (
     !data.name ||
     typeof data.name !== 'string' ||
@@ -24,10 +26,14 @@ export const BlogInputDtoValidation = (data: BlogInputDto): ValidationError[] =>
     !data.websiteUrl ||
     typeof data.websiteUrl !== 'string' ||
     data.websiteUrl.trim().length < 2 ||
-    data.websiteUrl.trim().length > 100
-  ) {
-    errors.push({ message: 'Invalid websiteUrl',field: 'websiteUrl' });
-  }
+    data.websiteUrl.trim().length > 100 ||
+    !websiteUrlPattern.test(data.websiteUrl.trim())
+  )  {
+  errors.push({
+    message: 'Invalid websiteUrl.',
+    field: 'websiteUrl'
+  });
+}
 
   return errors;
 };

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BlogInputDtoValidation = void 0;
 const BlogInputDtoValidation = (data) => {
     const errors = [];
+    const websiteUrlPattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
     if (!data.name ||
         typeof data.name !== 'string' ||
         data.name.trim().length < 2 ||
@@ -18,8 +19,12 @@ const BlogInputDtoValidation = (data) => {
     if (!data.websiteUrl ||
         typeof data.websiteUrl !== 'string' ||
         data.websiteUrl.trim().length < 2 ||
-        data.websiteUrl.trim().length > 100) {
-        errors.push({ message: 'Invalid websiteUrl', field: 'websiteUrl' });
+        data.websiteUrl.trim().length > 100 ||
+        !websiteUrlPattern.test(data.websiteUrl.trim())) {
+        errors.push({
+            message: 'Invalid websiteUrl.',
+            field: 'websiteUrl'
+        });
     }
     return errors;
 };
