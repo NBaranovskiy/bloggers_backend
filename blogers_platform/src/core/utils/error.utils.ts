@@ -1,7 +1,7 @@
-/**
- * @author Your Name
- * @description 
- * @created 03.05.2025
- */
+import {ValidationError} from "../../blogs/types/ValidationError";
 
-// Ваш код здесь
+export const createErrorMessages = (
+  errors: ValidationError[],
+): { errorMessages: ValidationError[] } => {
+  return { errorMessages: errors };
+};

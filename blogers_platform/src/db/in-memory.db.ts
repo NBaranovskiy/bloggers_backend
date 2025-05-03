@@ -1,7 +1,11 @@
-/**
- * @author Your Name
- * @description 
- * @created 03.05.2025
- */
+import {Blogger} from "../blogs/types/blogger";
+import {Post} from "../posts/types/post";
 
-// Ваш код здесь
+export const db = {
+  bloggers: <Blogger[]>[
+
+  ],
+  posts: <Post[]>[
+
+  ],
+};

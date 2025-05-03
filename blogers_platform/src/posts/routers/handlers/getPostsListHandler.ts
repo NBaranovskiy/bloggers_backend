@@ -1,7 +1,6 @@
-/**
- * @author Your Name
- * @description 
- * @created 03.05.2025
- */
+import { Request, Response } from 'express';
+import {db} from "../../../db/in-memory.db";
 
-// Ваш код здесь
+export function getPostsListHandler(req: Request,res:Response){
+    res.status(200).send(db.posts)
+}
