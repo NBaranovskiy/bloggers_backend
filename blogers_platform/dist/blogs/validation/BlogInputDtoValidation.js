@@ -1,31 +1,74 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BlogInputDtoValidation = void 0;
-const BlogInputDtoValidation = (data) => {
-    const errors = [];
-    const websiteUrlPattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
-    if (!data.name ||
-        typeof data.name !== 'string' ||
-        data.name.trim().length < 2 ||
-        data.name.trim().length > 15) {
-        errors.push({ message: 'Invalid name', field: 'name' });
-    }
-    if (!data.description ||
-        typeof data.description !== 'string' ||
-        data.description.trim().length < 2 ||
-        data.description.trim().length > 500) {
-        errors.push({ message: 'Invalid description', field: 'description' });
-    }
-    if (!data.websiteUrl ||
-        typeof data.websiteUrl !== 'string' ||
-        data.websiteUrl.trim().length < 2 ||
-        data.websiteUrl.trim().length > 100 ||
-        !websiteUrlPattern.test(data.websiteUrl.trim())) {
-        errors.push({
-            message: 'Invalid websiteUrl.',
-            field: 'websiteUrl'
+exports.validationMiddleware = exports.handleValidationErrors = exports.mongoIdValidation = exports.blogInputValidation = void 0;
+const express_validator_1 = require("express-validator");
+// import { BlogInputDto } from '../dto/blog.input-dto'; // Если нужна сама DTO для типизации, но для валидации она не обязательна
+// Определение паттерна для URL (или можно использовать встроенный isURL от express-validator)
+const websiteUrlPattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
+// --- Валидаторы ---
+// Валидация для полей BlogInputDto (для тела запроса POST/PUT)
+exports.blogInputValidation = [
+    (0, express_validator_1.body)('name')
+        .exists()
+        .withMessage('Name is required')
+        .isString()
+        .withMessage('Name must be a string')
+        .trim()
+        .isLength({ min: 2, max: 15 })
+        .withMessage('Name must be between 2 and 15 characters long'),
+    (0, express_validator_1.body)('description')
+        .exists()
+        .withMessage('Description is required')
+        .isString()
+        .withMessage('Description must be a string')
+        .trim()
+        .isLength({ min: 2, max: 500 })
+        .withMessage('Description must be between 2 and 500 characters long'),
+    (0, express_validator_1.body)('websiteUrl')
+        .exists()
+        .withMessage('Website URL is required')
+        .isString()
+        .withMessage('Website URL must be a string')
+        .trim()
+        .isLength({ min: 2, max: 100 })
+        .withMessage('Website URL must be between 2 and 100 characters long')
+        .matches(websiteUrlPattern)
+        .withMessage('Invalid Website URL format'),
+];
+// Валидация для параметра ID (для запросов GET/PUT/DELETE по ID)
+exports.mongoIdValidation = [
+    (0, express_validator_1.param)('id')
+        .exists()
+        .withMessage('ID is required')
+        .isString()
+        .withMessage('ID must be a string')
+        .isMongoId() // Проверяет, является ли строка корректным MongoDB ObjectId
+        .withMessage('Incorrect format of ObjectId'),
+];
+// --- Обработчик ошибок валидации ---
+/**
+ * Middleware для обработки результатов валидации express-validator.
+ * Если есть ошибки, отправляет ответ со статусом 400 и отформатированными ошибками.
+ */
+const handleValidationErrors = (req, res, next) => {
+    const errors = (0, express_validator_1.validationResult)(req);
+    if (!errors.isEmpty()) {
+        // LAST RESORT: Cast to 'any' if 'param' and 'path' are both not recognized
+        const formattedErrors = errors.array().map((error) => {
+            const field = error.param || error.path || ''; // Try both, fallback to empty
+            return {
+                message: error.msg,
+                field: field
+            };
         });
     }
-    return errors;
+    return next();
 };
-exports.BlogInputDtoValidation = BlogInputDtoValidation;
+exports.handleValidationErrors = handleValidationErrors;
+// --- Объединение в один пакет для экспорта (опционально, но удобно) ---
+// Если вы хотите экспортировать всё из одного места, можно сделать так:
+exports.validationMiddleware = {
+    blogInputValidation: exports.blogInputValidation,
+    mongoIdValidation: exports.mongoIdValidation,
+    handleValidationErrors: exports.handleValidationErrors,
+};

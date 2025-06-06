@@ -12,6 +12,6 @@ function deletePostHandler(req, res) {
     }
     ;
     in_memory_db_1.db.posts.splice(index, 1);
-    res.status(204);
+    res.sendStatus(204);
 }
 ;
