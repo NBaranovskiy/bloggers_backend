@@ -1,23 +1,45 @@
 "use strict";
+// src/routers/handlers/createPostHandler.ts
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createPostHandler = createPostHandler;
-const PostInputDtoValidation_1 = require("../../validation/PostInputDtoValidation");
-const error_utils_1 = require("../../../core/utils/error.utils");
-const in_memory_db_1 = require("../../../db/in-memory.db");
-function createPostHandler(req, res) {
-    const errors = (0, PostInputDtoValidation_1.PostInputDtoValidation)(req.body);
-    if (errors.length > 0) {
-        res.status(400).send((0, error_utils_1.createErrorMessages)(errors));
-        return;
+exports.createPostHandler = void 0;
+const posts_repository_1 = require("../../repositories/posts.repository"); // Import your postsRepository
+// We no longer need these imports for manual validation or in-memory DB
+// import { PostInputDtoValidation } from "../../validation/PostInputDtoValidation";
+// import { createErrorMessages } from "../../../core/utils/error.utils";
+// import { Post } from "../../types/post"; // postsRepository handles object creation now
+// import { db } from "../../../db/in-memory.db";
+const createPostHandler = (// Make the function async
+req, // Type the request body
+res) => __awaiter(void 0, void 0, void 0, function* () {
+    // All validation is now handled by middleware (postInputValidation, handleValidationErrors)
+    // before this handler is called. If there are validation errors,
+    // handleValidationErrors will already send a 400 response.
+    const { title, shortDescription, content, blogId } = req.body;
+    // Use the postsRepository to create the new post in MongoDB.
+    // The repository handles assigning _id, createdAt, and fetching blogName.
+    try {
+        const newPost = yield posts_repository_1.postsRepository.create({
+            title,
+            shortDescription,
+            content,
+            blogId
+        });
+        res.status(201).json(newPost); // Send the created post with a 201 status
     }
-    const newPost = {
-        id: in_memory_db_1.db.posts.length ? String(in_memory_db_1.db.posts[in_memory_db_1.db.posts.length - 1].id + 1) : "1",
-        title: req.body.title,
-        shortDescription: req.body.shortDescription,
-        content: req.body.content,
-        blogId: req.body.blogId,
-        blogName: in_memory_db_1.db.bloggers[in_memory_db_1.db.bloggers.findIndex(d => d.id === req.body.blogId)].name
-    };
-    in_memory_db_1.db.posts.push(newPost);
-    res.status(201).send(newPost);
-}
+    catch (error) {
+        // This catch block handles potential errors during the creation process,
+        // e.g., if the associated blog was not found (though validation should catch this).
+        console.error('Error creating post:', error);
+        res.status(500).json({ message: 'Failed to create post due to an internal error.' });
+    }
+});
+exports.createPostHandler = createPostHandler;

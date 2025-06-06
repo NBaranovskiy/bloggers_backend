@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
-import {db} from "../../../db/in-memory.db";
+import { postsRepository } from '../../repositories/posts.repository'; // Import your postsRepository
 
-export function getPostsListHandler(req: Request,res:Response){
-    res.status(200).send(db.posts)
-}
+export const getPostsListHandler = async (req: Request, res: Response) => { // Make the function async
+    // Fetch all posts from MongoDB using the repository
+    const posts = await postsRepository.findAll();
+
+    // Send the retrieved posts in the response
+    res.status(200).json(posts); // Use .json() for sending JSON data
+};
