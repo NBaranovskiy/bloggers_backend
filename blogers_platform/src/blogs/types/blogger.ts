@@ -1,10 +1,12 @@
-
+// src/types/blogger.ts
+import { ObjectId } from 'mongodb';
 
 export type Blogger = {
-    id: string,
-    name: string,
-    description: string,
-    websiteUrl: string,
-    createdAt: string; // Add this line
-    isMembership: boolean; // Add this line
+    _id?: ObjectId; // MongoDB's default ID, usually ObjectId
+    id?: string; // Your custom string ID, if needed for tests/API
+    name: string;
+    description: string;
+    websiteUrl: string;
+    createdAt: string;
+    isMembership: boolean;
 };

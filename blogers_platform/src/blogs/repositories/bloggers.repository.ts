@@ -2,59 +2,67 @@ import { Blogger } from '../types/blogger';
 import { BlogInputDto } from '../dto/blog.input-dto';
 import { bloggersCollection } from '../../db/mongo.db';
 import { ObjectId, WithId } from 'mongodb';
- 
+
 export const bloggersRepository = {
-  async findAll(): Promise<WithId<Blogger>[]> {
-    return bloggersCollection.find().toArray();
+  async findAll(): Promise<Blogger[]> { // Возвращаем Blogger[], а не WithId<Blogger>[]
+    const bloggers = await bloggersCollection.find().toArray();
+    // Преобразуем _id в id для каждого блогера
+    return bloggers.map(b => ({
+      ...b,
+      id: b._id.toString(), // Преобразуем ObjectId в строку для поля id
+      _id: undefined // Удаляем _id, если он не нужен в конечном объекте
+    })) as Blogger[]; // Приводим к Blogger[]
   },
- 
-  async findById(id: string): Promise<WithId<Blogger> | null> {
-    return bloggersCollection.findOne({ _id: new ObjectId(id) });
+
+  async findById(id: string): Promise<Blogger | null> { // Возвращаем Blogger, а не WithId<Blogger>
+    if (!ObjectId.isValid(id)) {
+      return null;
+    }
+    const blogger = await bloggersCollection.findOne({ _id: new ObjectId(id) });
+    if (!blogger) {
+      return null;
+    }
+    // Преобразуем _id в id при получении одного блогера
+    return {
+      ...blogger,
+      id: blogger._id.toString(),
+      _id: undefined // Удаляем _id
+    } as Blogger;
   },
- 
-  async create(dto: BlogInputDto): Promise<WithId<Blogger>> { // Pass the DTO here
-    // Generate the new properties
-    const newBlogger: Blogger = {
-      ...dto, // Spread properties from the DTO
-      id: new ObjectId().toString(), // Generate a custom string ID if you use it, or remove if _id is enough
-      createdAt: new Date().toISOString(), // ISO 8601 string for $date-time
-      isMembership: false // Default to false when creating a new blog
+
+  async create(dto: BlogInputDto): Promise<Blogger> { // Возвращаем Blogger, а не WithId<Blogger>
+    const newBloggerData = { // Создаем объект без _id, так как он будет добавлен MongoDB
+      name: dto.name,
+      description: dto.description,
+      websiteUrl: dto.websiteUrl,
+      createdAt: new Date().toISOString(),
+      isMembership: false
     };
-    const insertResult = await bloggersCollection.insertOne(newBlogger);
 
-    // MongoDB automatically adds _id to newBlogger after insertOne
-    return { ...newBlogger, _id: insertResult.insertedId };
+    const insertResult = await bloggersCollection.insertOne(newBloggerData);
+
+    // Возвращаем объект, который соответствует ожиданиям тестов (с полем `id`)
+    return {
+      ...newBloggerData,
+      id: insertResult.insertedId.toString(), // Используем _id от MongoDB как ваш id
+      _id: undefined // Опционально: если вы не хотите видеть _id в возвращаемом объекте
+    } as Blogger;
   },
- 
+
   async update(id: string, dto: BlogInputDto): Promise<void> {
-    const updateResult = await bloggersCollection.updateOne(
-      {
-        _id: new ObjectId(id),
-      },
-      {
-        $set: {
-          name: dto.name,
-          description: dto.description,
-          websiteUrl: dto.websiteUrl
-        },
-      },
+    if (!ObjectId.isValid(id)) {
+      throw new Error('Invalid Blogger ID');
+    }
+    await bloggersCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { name: dto.name, description: dto.description, websiteUrl: dto.websiteUrl } },
     );
- 
-    if (updateResult.matchedCount < 1) {
-      throw new Error('Blogger not exist');
-    }
-    return;
-  },
- 
-  async delete(id: string): Promise<void> {
-    const deleteResult = await bloggersCollection.deleteOne({
-      _id: new ObjectId(id),
-    });
- 
-    if (deleteResult.deletedCount < 1) {
-      throw new Error('Blogger not exist');
-    }
-    return;
   },
 
+  async delete(id: string): Promise<void> {
+    if (!ObjectId.isValid(id)) {
+      throw new Error('Invalid Blogger ID');
+    }
+    await bloggersCollection.deleteOne({ _id: new ObjectId(id) });
+  },
 };

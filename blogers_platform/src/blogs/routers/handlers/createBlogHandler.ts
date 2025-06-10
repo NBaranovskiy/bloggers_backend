@@ -29,8 +29,9 @@ export const createBlogHandler = async ( // Make the function async
             description,
             websiteUrl
         });
+        const { _id, ...blogWithoutId } = newBlog;
 
-        res.status(201).json(newBlog); // Send the created blog with a 201 status
+        res.status(201).json(blogWithoutId); // Send the created blog with a 201 status
     } catch (error: any) {
         // This catch block handles potential errors during the creation process,
         // such as database connection issues.
