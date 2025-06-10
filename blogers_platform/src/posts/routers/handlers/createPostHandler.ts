@@ -30,7 +30,9 @@ export const createPostHandler = async ( // Make the function async
             blogId
         });
 
-        res.status(201).json(newPost); // Send the created post with a 201 status
+        const {_id, ...postWithoutId} = newPost
+
+        res.status(201).json(postWithoutId); // Send the created post with a 201 status
     } catch (error: any) {
         // This catch block handles potential errors during the creation process,
         // e.g., if the associated blog was not found (though validation should catch this).

@@ -9,6 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createBlogHandler = void 0;
 const bloggers_repository_1 = require("../../repositories/bloggers.repository"); // Import your bloggersRepository
@@ -33,7 +44,8 @@ res) => __awaiter(void 0, void 0, void 0, function* () {
             description,
             websiteUrl
         });
-        res.status(201).json(newBlog); // Send the created blog with a 201 status
+        const { _id } = newBlog, blogWithoutId = __rest(newBlog, ["_id"]);
+        res.status(201).json(blogWithoutId); // Send the created blog with a 201 status
     }
     catch (error) {
         // This catch block handles potential errors during the creation process,
