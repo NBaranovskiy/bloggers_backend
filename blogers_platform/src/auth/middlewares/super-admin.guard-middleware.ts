@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from 'express';
 // которые могут быть установлены на уровне операционной системы или приложения и которые могут использоваться для
 // настройки поведения программного обеспечения (например, пароли, ключи API, пути к файлам и т. д.)
 export const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'qwerty';
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
 
 export const superAdminGuardMiddleware = (
   req: Request,
