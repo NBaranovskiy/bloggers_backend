@@ -21,8 +21,10 @@ res) => __awaiter(void 0, void 0, void 0, function* () {
     const blogId = req.params.id;
     const isDeleted = yield bloggers_repository_1.bloggersRepository.delete(blogId); // Получаем boolean
     if (!isDeleted) {
-        return res.sendStatus(404); // Пост не найден
+        res.status(404); // Пост не найден
+        return;
     }
-    return res.sendStatus(204); // Успешно удалено
+    res.status(204); // Успешно удалено
+    return;
 });
 exports.deleteBloggerHandler = deleteBloggerHandler;

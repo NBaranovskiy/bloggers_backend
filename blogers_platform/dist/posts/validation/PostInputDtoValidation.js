@@ -25,65 +25,65 @@ const websiteUrlPattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-
 exports.blogInputValidation = [
     (0, express_validator_1.body)('name')
         .exists()
-        .withMessage('Name is required')
+        .withMessage('Name is required').bail()
         .isString()
-        .withMessage('Name must be a string')
+        .withMessage('Name must be a string').bail()
         .trim()
         .isLength({ min: 2, max: 15 })
-        .withMessage('Name must be between 2 and 15 characters long'),
+        .withMessage('Name must be between 2 and 15 characters long').bail(),
     (0, express_validator_1.body)('description')
         .exists()
-        .withMessage('Description is required')
+        .withMessage('Description is required').bail()
         .isString()
-        .withMessage('Description must be a string')
+        .withMessage('Description must be a string').bail()
         .trim()
         .isLength({ min: 2, max: 500 })
-        .withMessage('Description must be between 2 and 500 characters long'),
+        .withMessage('Description must be between 2 and 500 characters long').bail(),
     (0, express_validator_1.body)('websiteUrl')
         .exists()
-        .withMessage('Website URL is required')
+        .withMessage('Website URL is required').bail()
         .isString()
-        .withMessage('Website URL must be a string')
+        .withMessage('Website URL must be a string').bail()
         .trim()
         .isLength({ min: 2, max: 100 })
-        .withMessage('Website URL must be between 2 and 100 characters long')
+        .withMessage('Website URL must be between 2 and 100 characters long').bail()
         .matches(websiteUrlPattern)
-        .withMessage('Invalid Website URL format'),
+        .withMessage('Invalid Website URL format').bail(),
 ];
 // Валидация для полей PostInputDto (остаётся без изменений, т.к. rely on isMongoId and repository)
 exports.postInputValidation = [
     (0, express_validator_1.body)('title')
-        .exists().bail()
-        .withMessage('Title is required')
+        .exists()
+        .withMessage('Title is required').bail()
         .isString()
-        .withMessage('Title must be a string')
+        .withMessage('Title must be a string').bail()
         .trim()
         .isLength({ min: 2, max: 30 })
-        .withMessage('Title must be between 2 and 30 characters long'),
+        .withMessage('Title must be between 2 and 30 characters long').bail(),
     (0, express_validator_1.body)('shortDescription')
-        .exists().bail()
-        .withMessage('Short description is required')
+        .exists()
+        .withMessage('Short description is required').bail()
         .isString()
-        .withMessage('Short description must be a string')
+        .withMessage('Short description must be a string').bail()
         .trim()
         .isLength({ min: 2, max: 100 })
-        .withMessage('Short description must be between 2 and 100 characters long'),
+        .withMessage('Short description must be between 2 and 100 characters long').bail(),
     (0, express_validator_1.body)('content')
-        .exists().bail()
-        .withMessage('Content is required')
+        .exists()
+        .withMessage('Content is required').bail()
         .isString()
-        .withMessage('Content must be a string')
+        .withMessage('Content must be a string').bail()
         .trim()
         .isLength({ min: 2, max: 1000 })
-        .withMessage('Content must be between 2 and 1000 characters long'),
+        .withMessage('Content must be between 2 and 1000 characters long').bail(),
     (0, express_validator_1.body)('blogId')
-        .exists().bail()
-        .withMessage('Blog ID is required')
+        .exists()
+        .withMessage('Blog ID is required').bail()
         .isString()
-        .withMessage('Blog ID must be a string')
+        .withMessage('Blog ID must be a string').bail()
         .trim()
         .isMongoId()
-        .withMessage('Blog ID must be a valid MongoDB ObjectId')
+        .withMessage('Blog ID must be a valid MongoDB ObjectId').bail()
         .custom((blogId) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const blogExists = yield bloggers_repository_1.bloggersRepository.findById(blogId);
@@ -101,12 +101,12 @@ exports.postInputValidation = [
 // Валидация для параметра ID (остаётся без изменений)
 exports.mongoIdValidation = [
     (0, express_validator_1.param)('id')
-        .exists().bail()
-        .withMessage('ID is required')
+        .exists()
+        .withMessage('ID is required').bail()
         .isString()
-        .withMessage('ID must be a string')
+        .withMessage('ID must be a string').bail()
         .isMongoId() // Проверяет, является ли строка корректным MongoDB ObjectId
-        .withMessage('Incorrect format of ObjectId'),
+        .withMessage('Incorrect format of ObjectId').bail(),
 ];
 const handleValidationErrors = (req, res, next) => {
     const errors = (0, express_validator_1.validationResult)(req);

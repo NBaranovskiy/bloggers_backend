@@ -2,7 +2,6 @@
 
 import { Request, Response } from 'express';
 import { bloggersRepository } from '../../repositories/bloggers.repository';
-import {postsRepository} from "../../../posts/repositories/posts.repository"; // Import your bloggersRepository
 
 // We no longer need the in-memory database or createErrorMessages
 // import {db} from "../../../db/in-memory.db";
@@ -18,9 +17,11 @@ export const deleteBloggerHandler = async ( // Make the function async
     const isDeleted = await bloggersRepository.delete(blogId); // Получаем boolean
 
     if (!isDeleted) {
-        return res.sendStatus(404); // Пост не найден
+        res.status(404); // Пост не найден
+        return;
     }
-    return res.sendStatus(204); // Успешно удалено
+    res.status(204); // Успешно удалено
+    return;
 
 
 };

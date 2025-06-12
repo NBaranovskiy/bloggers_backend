@@ -19,41 +19,41 @@ const websiteUrlPattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-
 // Валидация для полей BlogInputDto (для тела запроса POST/PUT)
 exports.blogInputValidation = [
     (0, express_validator_1.body)('name')
-        .exists().bail()
-        .withMessage('Name is required')
+        .exists()
+        .withMessage('Name is required').bail()
         .isString()
-        .withMessage('Name must be a string')
+        .withMessage('Name must be a string').bail()
         .trim()
         .isLength({ min: 2, max: 15 })
-        .withMessage('Name must be between 2 and 15 characters long'),
+        .withMessage('Name must be between 2 and 15 characters long').bail(),
     (0, express_validator_1.body)('description')
-        .exists().bail()
-        .withMessage('Description is required')
+        .exists()
+        .withMessage('Description is required').bail()
         .isString()
-        .withMessage('Description must be a string')
+        .withMessage('Description must be a string').bail()
         .trim()
         .isLength({ min: 2, max: 500 })
-        .withMessage('Description must be between 2 and 500 characters long'),
+        .withMessage('Description must be between 2 and 500 characters long').bail(),
     (0, express_validator_1.body)('websiteUrl')
-        .exists().bail()
-        .withMessage('Website URL is required')
+        .exists()
+        .withMessage('Website URL is required').bail()
         .isString()
-        .withMessage('Website URL must be a string')
+        .withMessage('Website URL must be a string').bail()
         .trim()
         .isLength({ min: 2, max: 100 })
-        .withMessage('Website URL must be between 2 and 100 characters long')
+        .withMessage('Website URL must be between 2 and 100 characters long').bail()
         .matches(websiteUrlPattern)
-        .withMessage('Invalid Website URL format'),
+        .withMessage('Invalid Website URL format').bail(),
 ];
 // Валидация для параметра ID (для запросов GET/PUT/DELETE по ID)
 exports.mongoIdValidation = [
     (0, express_validator_1.param)('id')
-        .exists().bail()
-        .withMessage('Blog ID is required')
+        .exists()
+        .withMessage('Blog ID is required').bail()
         .isString()
-        .withMessage('Blog ID must be a string')
+        .withMessage('Blog ID must be a string').bail()
         .isMongoId() // Проверяет, является ли строка корректным MongoDB ObjectId
-        .withMessage('Incorrect format of Blog ID')
+        .withMessage('Incorrect format of Blog ID').bail()
         .custom((id_1, _a) => __awaiter(void 0, [id_1, _a], void 0, function* (id, { req }) {
         // Эта кастомная валидация выполняется только если ID уже прошел проверку isMongoId()
         const blog = yield bloggers_repository_1.bloggersRepository.findById(id);
