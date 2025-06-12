@@ -11,9 +11,9 @@ export const deletePostHandler = async (
 
     if (!isDeleted) {
 
-        res.status(404); // Пост не найден
+        res.sendStatus(404); // Пост не найден
         return;
     }
-    res.status(204); // Успешно удалено
+    res.sendStatus(204); // Успешно удалено
     return;
 };

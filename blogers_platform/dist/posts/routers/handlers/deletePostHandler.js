@@ -15,10 +15,10 @@ const deletePostHandler = (req, res) => __awaiter(void 0, void 0, void 0, functi
     const postId = req.params.id;
     const isDeleted = yield posts_repository_1.postsRepository.delete(postId); // Получаем boolean
     if (!isDeleted) {
-        res.status(404); // Пост не найден
+        res.sendStatus(404); // Пост не найден
         return;
     }
-    res.status(204); // Успешно удалено
+    res.sendStatus(204); // Успешно удалено
     return;
 });
 exports.deletePostHandler = deletePostHandler;

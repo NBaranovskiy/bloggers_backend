@@ -49,13 +49,7 @@ export const mongoIdValidation = [
     .withMessage('Blog ID must be a string').bail()
     .isMongoId() // Проверяет, является ли строка корректным MongoDB ObjectId
     .withMessage('Incorrect format of Blog ID').bail()
-    .custom(async (id: string, { req }) => {
-      // Эта кастомная валидация выполняется только если ID уже прошел проверку isMongoId()
-      const blog = await bloggersRepository.findById(id);
-      if (!blog) {
-        throw new Error('Blog not found'); // Сообщение об ошибке, если блог не существует
-      }
-    }),
+
 ];
 
 // --- Обработчик ошибок валидации ---
