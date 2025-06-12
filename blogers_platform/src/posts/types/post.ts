@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 
 export type Post = {
     _id?: ObjectId; // MongoDB _id
+    id?: string; // Your custom string ID, if needed for tests/API
     title: string;
     shortDescription: string;
     content: string;

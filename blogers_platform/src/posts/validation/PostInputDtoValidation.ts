@@ -49,7 +49,7 @@ export const blogInputValidation = [
 // Валидация для полей PostInputDto (остаётся без изменений, т.к. rely on isMongoId and repository)
 export const postInputValidation = [
   body('title')
-    .exists()
+    .exists().bail()
     .withMessage('Title is required')
     .isString()
     .withMessage('Title must be a string')
@@ -58,7 +58,7 @@ export const postInputValidation = [
     .withMessage('Title must be between 2 and 30 characters long'),
 
   body('shortDescription')
-    .exists()
+    .exists().bail()
     .withMessage('Short description is required')
     .isString()
     .withMessage('Short description must be a string')
@@ -67,7 +67,7 @@ export const postInputValidation = [
     .withMessage('Short description must be between 2 and 100 characters long'),
 
   body('content')
-    .exists()
+    .exists().bail()
     .withMessage('Content is required')
     .isString()
     .withMessage('Content must be a string')
@@ -76,7 +76,7 @@ export const postInputValidation = [
     .withMessage('Content must be between 2 and 1000 characters long'),
 
   body('blogId')
-    .exists()
+    .exists().bail()
     .withMessage('Blog ID is required')
     .isString()
     .withMessage('Blog ID must be a string')
@@ -100,7 +100,7 @@ export const postInputValidation = [
 // Валидация для параметра ID (остаётся без изменений)
 export const mongoIdValidation = [
   param('id')
-    .exists()
+    .exists().bail()
     .withMessage('ID is required')
     .isString()
     .withMessage('ID must be a string')
@@ -124,7 +124,8 @@ export const handleValidationErrors = (req: Request, res: Response, next: NextFu
 
     // Отправляем ответ со статусом 400 и ошибками валидации
     // и завершаем обработку запроса, чтобы избежать вызова next()
-    return res.status(400).json({ errorsMessages: formattedErrors });
+    res.status(400).json({ errorsMessages: formattedErrors });
+    return;
   }
 
   // Если ошибок нет, передаём управление следующему middleware

@@ -19,7 +19,7 @@ const websiteUrlPattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-
 // Валидация для полей BlogInputDto (для тела запроса POST/PUT)
 exports.blogInputValidation = [
     (0, express_validator_1.body)('name')
-        .exists()
+        .exists().bail()
         .withMessage('Name is required')
         .isString()
         .withMessage('Name must be a string')
@@ -27,7 +27,7 @@ exports.blogInputValidation = [
         .isLength({ min: 2, max: 15 })
         .withMessage('Name must be between 2 and 15 characters long'),
     (0, express_validator_1.body)('description')
-        .exists()
+        .exists().bail()
         .withMessage('Description is required')
         .isString()
         .withMessage('Description must be a string')
@@ -35,7 +35,7 @@ exports.blogInputValidation = [
         .isLength({ min: 2, max: 500 })
         .withMessage('Description must be between 2 and 500 characters long'),
     (0, express_validator_1.body)('websiteUrl')
-        .exists()
+        .exists().bail()
         .withMessage('Website URL is required')
         .isString()
         .withMessage('Website URL must be a string')
@@ -48,7 +48,7 @@ exports.blogInputValidation = [
 // Валидация для параметра ID (для запросов GET/PUT/DELETE по ID)
 exports.mongoIdValidation = [
     (0, express_validator_1.param)('id')
-        .exists()
+        .exists().bail()
         .withMessage('Blog ID is required')
         .isString()
         .withMessage('Blog ID must be a string')
@@ -78,7 +78,7 @@ const handleValidationErrors = (req, res, next) => {
                 field: field
             };
         });
-        res.status(400).json({ errorsMessages: formattedErrors });
+        res.status(404).json({ errorsMessages: formattedErrors });
         return;
     }
     return next();

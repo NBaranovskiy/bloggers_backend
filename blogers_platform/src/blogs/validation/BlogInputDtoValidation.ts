@@ -11,7 +11,7 @@ const websiteUrlPattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-
 // Валидация для полей BlogInputDto (для тела запроса POST/PUT)
 export const blogInputValidation = [
   body('name')
-    .exists()
+    .exists().bail()
     .withMessage('Name is required')
     .isString()
     .withMessage('Name must be a string')
@@ -20,7 +20,7 @@ export const blogInputValidation = [
     .withMessage('Name must be between 2 and 15 characters long'),
 
   body('description')
-    .exists()
+    .exists().bail()
     .withMessage('Description is required')
     .isString()
     .withMessage('Description must be a string')
@@ -29,7 +29,7 @@ export const blogInputValidation = [
     .withMessage('Description must be between 2 and 500 characters long'),
 
   body('websiteUrl')
-    .exists()
+    .exists().bail()
     .withMessage('Website URL is required')
     .isString()
     .withMessage('Website URL must be a string')
@@ -43,7 +43,7 @@ export const blogInputValidation = [
 // Валидация для параметра ID (для запросов GET/PUT/DELETE по ID)
 export const mongoIdValidation = [
   param('id')
-    .exists()
+    .exists().bail()
     .withMessage('Blog ID is required')
     .isString()
     .withMessage('Blog ID must be a string')
@@ -77,7 +77,7 @@ export const handleValidationErrors = (req: Request, res: Response, next: NextFu
       };
 
     });
-    res.status(400).json({ errorsMessages: formattedErrors });
+    res.status(404).json({ errorsMessages: formattedErrors });
     return;
   }
   return next();

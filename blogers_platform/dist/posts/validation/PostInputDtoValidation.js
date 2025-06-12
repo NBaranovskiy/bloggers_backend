@@ -53,7 +53,7 @@ exports.blogInputValidation = [
 // Валидация для полей PostInputDto (остаётся без изменений, т.к. rely on isMongoId and repository)
 exports.postInputValidation = [
     (0, express_validator_1.body)('title')
-        .exists()
+        .exists().bail()
         .withMessage('Title is required')
         .isString()
         .withMessage('Title must be a string')
@@ -61,7 +61,7 @@ exports.postInputValidation = [
         .isLength({ min: 2, max: 30 })
         .withMessage('Title must be between 2 and 30 characters long'),
     (0, express_validator_1.body)('shortDescription')
-        .exists()
+        .exists().bail()
         .withMessage('Short description is required')
         .isString()
         .withMessage('Short description must be a string')
@@ -69,7 +69,7 @@ exports.postInputValidation = [
         .isLength({ min: 2, max: 100 })
         .withMessage('Short description must be between 2 and 100 characters long'),
     (0, express_validator_1.body)('content')
-        .exists()
+        .exists().bail()
         .withMessage('Content is required')
         .isString()
         .withMessage('Content must be a string')
@@ -77,7 +77,7 @@ exports.postInputValidation = [
         .isLength({ min: 2, max: 1000 })
         .withMessage('Content must be between 2 and 1000 characters long'),
     (0, express_validator_1.body)('blogId')
-        .exists()
+        .exists().bail()
         .withMessage('Blog ID is required')
         .isString()
         .withMessage('Blog ID must be a string')
@@ -101,7 +101,7 @@ exports.postInputValidation = [
 // Валидация для параметра ID (остаётся без изменений)
 exports.mongoIdValidation = [
     (0, express_validator_1.param)('id')
-        .exists()
+        .exists().bail()
         .withMessage('ID is required')
         .isString()
         .withMessage('ID must be a string')
@@ -123,7 +123,8 @@ const handleValidationErrors = (req, res, next) => {
         });
         // Отправляем ответ со статусом 400 и ошибками валидации
         // и завершаем обработку запроса, чтобы избежать вызова next()
-        return res.status(400).json({ errorsMessages: formattedErrors });
+        res.status(400).json({ errorsMessages: formattedErrors });
+        return;
     }
     // Если ошибок нет, передаём управление следующему middleware
     return next();
