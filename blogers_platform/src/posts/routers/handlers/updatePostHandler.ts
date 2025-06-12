@@ -17,19 +17,12 @@ export const updatePostHandler = async ( // Make the function async
 
     const updateData = req.body;
 
-    try {
-        // Use the postsRepository to update the post by its MongoDB _id
-        await postsRepository.update(postId, updateData);
-        res.sendStatus(204); // Send 204 No Content for successful update
-    } catch (error: any) {
-        // Handle specific errors thrown by the repository
-        if (error.message === 'Post not exist') {
-            // This means the post with the given ID was not found
-            res.sendStatus(404); // Send 404 Not Found
-        } else {
-            // Log any other unexpected errors and send a 500
-            console.error('Error updating post:', error);
-            res.sendStatus(500); // Internal Server Error
-        }
+    const isUpdated = await postsRepository.update(postId,updateData)
+
+    if(!isUpdated){
+        res.sendStatus(404);
+        return;
     }
+    res.sendStatus(204);
+    return;
 };

@@ -22,20 +22,12 @@ export const updateBloggerHandler = async ( // Make the function async
     // So, no need to run validation or check for errors here.
 
     const updateData = req.body;
+    const isUpdated = await bloggersRepository.update(bloggerId,updateData)
 
-    try {
-        // Use the bloggersRepository to update the blog by its MongoDB _id
-        await bloggersRepository.update(bloggerId, updateData);
-        res.sendStatus(204); // Send 204 No Content for successful update
-    } catch (error: any) {
-        // Handle specific errors thrown by the repository
-        if (error.message === 'Blogger not exist') {
-            // This means the blog with the given ID was not found
-            res.sendStatus(404); // Send 404 Not Found
-        } else {
-            // Log any other unexpected errors and send a 500
-            console.error('Error updating blogger:', error);
-            res.sendStatus(500); // Internal Server Error
-        }
+    if (!isUpdated){
+        res.sendStatus(404);
+        return;
     }
+    res.sendStatus(204);
+    return;
 };

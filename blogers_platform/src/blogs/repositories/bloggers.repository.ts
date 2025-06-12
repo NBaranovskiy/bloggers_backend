@@ -52,7 +52,7 @@ export const bloggersRepository = {
 
   async update(id: string, dto: BlogInputDto): Promise<boolean> {
     if (!ObjectId.isValid(id)) {
-      throw new Error('Invalid Blogger ID');
+      return false;
     }
     const updateResult = await bloggersCollection.updateOne(
       { _id: new ObjectId(id) },
