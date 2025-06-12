@@ -108,22 +108,25 @@ export const mongoIdValidation = [
     .withMessage('Incorrect format of ObjectId'),
 ];
 
-// Обработчик ошибок валидации
 export const handleValidationErrors = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const formattedErrors = errors.array().map((error: any) => { // 'any' для обхода ошибки типизации 'path'
-      const field = error.path || '';
-
+    const formattedErrors = errors.array().map((error: any) => { // Используем 'any' для гибкости
+      // Пробуем error.param, затем error.path, иначе пустая строка.
+      // Это обеспечивает максимальную совместимость с различными версиями express-validator
+      // и тестовыми окружениями.
+      const field = error.param || error.path || '';
       return {
         message: error.msg,
         field: field
       };
     });
 
-    // **** ИСПРАВЛЕНИЕ: ВОССТАНАВЛИВАЕМ ОТПРАВКУ ОТВЕТА И return ****
-    res.status(400).json({ errorsMessages: formattedErrors });
-    return; // Завершаем выполнение middleware
+    // Отправляем ответ со статусом 400 и ошибками валидации
+    // и завершаем обработку запроса, чтобы избежать вызова next()
+    return res.status(400).json({ errorsMessages: formattedErrors });
   }
-  return next(); // Передаем управление следующему middleware
+
+  // Если ошибок нет, передаём управление следующему middleware
+  return next();
 };

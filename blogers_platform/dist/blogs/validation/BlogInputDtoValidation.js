@@ -1,7 +1,17 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validationMiddleware = exports.handleValidationErrors = exports.mongoIdValidation = exports.blogInputValidation = void 0;
 const express_validator_1 = require("express-validator");
+const bloggers_repository_1 = require("../../blogs/repositories/bloggers.repository");
 // import { BlogInputDto } from '../dto/blog.input-dto'; // Если нужна сама DTO для типизации, но для валидации она не обязательна
 // Определение паттерна для URL (или можно использовать встроенный isURL от express-validator)
 const websiteUrlPattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
@@ -39,11 +49,18 @@ exports.blogInputValidation = [
 exports.mongoIdValidation = [
     (0, express_validator_1.param)('id')
         .exists()
-        .withMessage('ID is required')
+        .withMessage('Blog ID is required')
         .isString()
-        .withMessage('ID must be a string')
+        .withMessage('Blog ID must be a string')
         .isMongoId() // Проверяет, является ли строка корректным MongoDB ObjectId
-        .withMessage('Incorrect format of ObjectId'),
+        .withMessage('Incorrect format of Blog ID')
+        .custom((id_1, _a) => __awaiter(void 0, [id_1, _a], void 0, function* (id, { req }) {
+        // Эта кастомная валидация выполняется только если ID уже прошел проверку isMongoId()
+        const blog = yield bloggers_repository_1.bloggersRepository.findById(id);
+        if (!blog) {
+            throw new Error('Blog not found'); // Сообщение об ошибке, если блог не существует
+        }
+    })),
 ];
 // --- Обработчик ошибок валидации ---
 /**
@@ -61,6 +78,8 @@ const handleValidationErrors = (req, res, next) => {
                 field: field
             };
         });
+        res.status(400).json({ errorsMessages: formattedErrors });
+        return;
     }
     return next();
 };

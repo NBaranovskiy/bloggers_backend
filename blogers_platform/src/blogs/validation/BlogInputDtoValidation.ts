@@ -1,5 +1,6 @@
 import { body, param, validationResult,ValidationError  } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
+import { bloggersRepository } from '../../blogs/repositories/bloggers.repository';
 // import { BlogInputDto } from '../dto/blog.input-dto'; // Если нужна сама DTO для типизации, но для валидации она не обязательна
 
 // Определение паттерна для URL (или можно использовать встроенный isURL от express-validator)
@@ -43,11 +44,18 @@ export const blogInputValidation = [
 export const mongoIdValidation = [
   param('id')
     .exists()
-    .withMessage('ID is required')
+    .withMessage('Blog ID is required')
     .isString()
-    .withMessage('ID must be a string')
+    .withMessage('Blog ID must be a string')
     .isMongoId() // Проверяет, является ли строка корректным MongoDB ObjectId
-    .withMessage('Incorrect format of ObjectId'),
+    .withMessage('Incorrect format of Blog ID')
+    .custom(async (id: string, { req }) => {
+      // Эта кастомная валидация выполняется только если ID уже прошел проверку isMongoId()
+      const blog = await bloggersRepository.findById(id);
+      if (!blog) {
+        throw new Error('Blog not found'); // Сообщение об ошибке, если блог не существует
+      }
+    }),
 ];
 
 // --- Обработчик ошибок валидации ---
@@ -67,7 +75,10 @@ export const handleValidationErrors = (req: Request, res: Response, next: NextFu
         message: error.msg,
         field: field
       };
+
     });
+    res.status(400).json({ errorsMessages: formattedErrors });
+    return;
   }
   return next();
 };
