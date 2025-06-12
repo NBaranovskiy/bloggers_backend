@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router,Request,Response } from 'express';
 import { getPostsListHandler } from './handlers/getPostsListHandler';
 import { createPostHandler } from './handlers/createPostHandler';
 import { getByIdPost } from './handlers/getByIdPost';

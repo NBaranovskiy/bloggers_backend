@@ -59,10 +59,11 @@ export const bloggersRepository = {
     );
   },
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string): Promise<boolean> {
     if (!ObjectId.isValid(id)) {
-      throw new Error('Invalid Blogger ID');
+      return false;
     }
     await bloggersCollection.deleteOne({ _id: new ObjectId(id) });
+    return true;
   },
 };
