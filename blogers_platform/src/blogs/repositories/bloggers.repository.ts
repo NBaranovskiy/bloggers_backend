@@ -1,7 +1,8 @@
 import { Blogger } from '../types/blogger';
 import { BlogInputDto } from '../dto/blog.input-dto';
-import { bloggersCollection } from '../../db/mongo.db';
+import {bloggersCollection, postsCollection} from '../../db/mongo.db';
 import { ObjectId, WithId } from 'mongodb';
+import {PostInputDto} from "../../posts/dto/post.input-dto";
 
 export const bloggersRepository = {
   async findAll(): Promise<Blogger[]> { // Возвращаем Blogger[], а не WithId<Blogger>[]
@@ -49,21 +50,24 @@ export const bloggersRepository = {
     } as Blogger;
   },
 
-  async update(id: string, dto: BlogInputDto): Promise<void> {
+  async update(id: string, dto: BlogInputDto): Promise<boolean> {
     if (!ObjectId.isValid(id)) {
       throw new Error('Invalid Blogger ID');
     }
-    await bloggersCollection.updateOne(
+    const updateResult = await bloggersCollection.updateOne(
       { _id: new ObjectId(id) },
       { $set: { name: dto.name, description: dto.description, websiteUrl: dto.websiteUrl } },
     );
+    return updateResult.modifiedCount  > 0;
   },
+
+
 
   async delete(id: string): Promise<boolean> {
     if (!ObjectId.isValid(id)) {
       return false;
     }
-    await bloggersCollection.deleteOne({ _id: new ObjectId(id) });
-    return true;
+    const deleteResult = await bloggersCollection.deleteOne({ _id: new ObjectId(id) });
+    return deleteResult.deletedCount > 0;
   },
 };

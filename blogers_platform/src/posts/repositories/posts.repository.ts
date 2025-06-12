@@ -73,7 +73,7 @@ export const postsRepository = {
       },
     );
     // Возвращаем true, если документ был найден и изменен, иначе false
-    return updateResult.matchedCount > 0;
+    return updateResult.modifiedCount  > 0;
   },
 
   async delete(id: string): Promise<boolean> { // Возвращает boolean
