@@ -20,7 +20,7 @@ exports.blogRouter
 BlogInputDtoValidation_1.handleValidationErrors, // Handle any validation errors
 createBlogHandler_1.createBlogHandler)
     .get('/:blogId/posts', BlogInputDtoValidation_1.mongoIdValidation, BlogInputDtoValidation_1.handleValidationErrors, getPostsByIdBlogHandler_1.getPostsByIdBlogHandler)
-    .post('/:blogId/posts', super_admin_guard_middleware_1.superAdminGuardMiddleware, BlogInputDtoValidation_1.blogInputValidation, PostInputDtoValidation_1.postInputValidation, BlogInputDtoValidation_1.handleValidationErrors, createPostForBlogHandler_1.createPostForBlogHandler)
+    .post('/:blogId/posts', super_admin_guard_middleware_1.superAdminGuardMiddleware, PostInputDtoValidation_1.postInputValidation, BlogInputDtoValidation_1.handleValidationErrors, createPostForBlogHandler_1.createPostForBlogHandler)
     .get('/:id', BlogInputDtoValidation_1.mongoIdValidation, // Apply validation for the 'id' parameter
 BlogInputDtoValidation_1.handleValidationErrors, // Handle any validation errors
 getByIdBlogger_1.getByIdBlogger)
