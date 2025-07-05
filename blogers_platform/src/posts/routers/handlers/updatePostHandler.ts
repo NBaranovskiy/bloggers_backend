@@ -2,7 +2,8 @@
 
 import { Request, Response } from 'express';
 import { postsRepository } from '../../repositories/posts.repository'; // Import your postsRepository
-import { PostInputDto } from '../../dto/post.input-dto'; // Import your DTO
+import { PostInputDto } from '../../dto/post.input-dto';
+import {postsServices} from "../../application/posts.services"; // Import your DTO
 
 
 export const updatePostHandler = async ( // Make the function async
@@ -17,7 +18,7 @@ export const updatePostHandler = async ( // Make the function async
 
     const updateData = req.body;
 
-    const isUpdated = await postsRepository.update(postId,updateData)
+    const isUpdated = await postsServices.update(postId,updateData)
 
     if(!isUpdated){
         res.sendStatus(404);

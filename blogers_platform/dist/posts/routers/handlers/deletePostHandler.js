@@ -10,10 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePostHandler = void 0;
-const posts_repository_1 = require("../../../posts/repositories/posts.repository"); // <-- Check this path carefully
+const posts_services_1 = require("../../application/posts.services"); // <-- Check this path carefully
 const deletePostHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const postId = req.params.id;
-    const isDeleted = yield posts_repository_1.postsRepository.delete(postId); // Получаем boolean
+    const isDeleted = yield posts_services_1.postsServices.delete(postId); // Получаем boolean
     if (!isDeleted) {
         res.sendStatus(404); // Пост не найден
         return;

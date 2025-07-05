@@ -11,13 +11,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBlogsListHandler = void 0;
-const bloggers_repository_1 = require("../../repositories/bloggers.repository"); // Import your bloggersRepository
+const blogs_services_1 = require("../../application/blogs.services");
 // We no longer need the in-memory database import
 // import { db } from "../../../db/in-memory.db";
 const getBlogsListHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // Fetch all blogs from MongoDB using the repository
-    const blogs = yield bloggers_repository_1.bloggersRepository.findAll();
-    // Send the retrieved blogs in the response
-    res.status(200).json(blogs); // Use .json() for sending JSON data
+    const queryDto = {
+        searchNameTerm: req.query.searchNameTerm ? String(req.query.searchNameTerm) : undefined,
+        sortBy: req.query.sortBy ? String(req.query.sortBy) : undefined,
+        sortDirection: req.query.sortDirection ? String(req.query.sortDirection) : undefined,
+        pageNumber: req.query.pageNumber ? Number(req.query.pageNumber) : undefined,
+        pageSize: req.query.pageSize ? Number(req.query.pageSize) : undefined,
+    };
+    try {
+        const result = yield blogs_services_1.blogsServices.findAll(queryDto);
+        res.status(200).json(result);
+    }
+    catch (error) {
+        res.sendStatus(500);
+    }
 });
 exports.getBlogsListHandler = getBlogsListHandler;

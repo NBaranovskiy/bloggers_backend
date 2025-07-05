@@ -2,7 +2,8 @@
 
 import { Request, Response } from 'express';
 import { postsRepository } from '../../repositories/posts.repository'; // Import your postsRepository
-import { PostInputDto } from '../../dto/post.input-dto'; // Import your DTO
+import { PostInputDto } from '../../dto/post.input-dto';
+import {postsServices} from "../../application/posts.services"; // Import your DTO
 
 // We no longer need these imports for manual validation or in-memory DB
 // import { PostInputDtoValidation } from "../../validation/PostInputDtoValidation";
@@ -23,7 +24,7 @@ export const createPostHandler = async ( // Make the function async
     // Use the postsRepository to create the new post in MongoDB.
     // The repository handles assigning _id, createdAt, and fetching blogName.
     try {
-        const newPost = await postsRepository.create({
+        const newPost = await postsServices.create({
             title,
             shortDescription,
             content,

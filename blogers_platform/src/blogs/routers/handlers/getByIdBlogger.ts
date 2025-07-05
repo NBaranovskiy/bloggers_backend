@@ -1,7 +1,8 @@
 // src/routers/handlers/getByIdBlogger.ts
 
 import { Request, Response } from 'express';
-import { bloggersRepository } from '../../repositories/bloggers.repository'; // Import your bloggersRepository
+import { bloggersRepository } from '../../repositories/bloggers.repository';
+import {blogsServices} from "../../application/blogs.services"; // Import your bloggersRepository
 
 // We no longer need these imports for the in-memory DB or manual error messages
 // import {db} from "../../../db/in-memory.db";
@@ -14,7 +15,7 @@ export const getByIdBlogger = async ( // Make the function async
     const bloggerId = req.params.id; // This 'id' is a string representing a MongoDB ObjectId
 
     // Fetch the blogger from MongoDB using the repository
-    const blogger = await bloggersRepository.findById(bloggerId);
+    const blogger = await blogsServices.findByIdorFail(bloggerId);
 
     if (!blogger) {
         // If the blogger is not found, send a 404 response

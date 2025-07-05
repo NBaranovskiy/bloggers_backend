@@ -2,7 +2,8 @@
 
 import { Request, Response } from 'express';
 import { bloggersRepository } from '../../repositories/bloggers.repository'; // Import your bloggersRepository
-import { BlogInputDto } from '../../dto/blog.input-dto'; // Import your DTO
+import { BlogInputDto } from '../../dto/blog.input-dto';
+import {blogsServices} from "../../application/blogs.services"; // Import your DTO
 
 // We no longer need these imports for manual validation or in-memory DB
 // import { db } from "../../../db/in-memory.db";
@@ -22,7 +23,7 @@ export const updateBloggerHandler = async ( // Make the function async
     // So, no need to run validation or check for errors here.
 
     const updateData = req.body;
-    const isUpdated = await bloggersRepository.update(bloggerId,updateData)
+    const isUpdated = await blogsServices.update(bloggerId,updateData)
 
     if (!isUpdated){
         res.sendStatus(404);

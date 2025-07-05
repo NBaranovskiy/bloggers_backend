@@ -22,7 +22,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPostHandler = void 0;
-const posts_repository_1 = require("../../repositories/posts.repository"); // Import your postsRepository
+const posts_services_1 = require("../../application/posts.services"); // Import your DTO
 // We no longer need these imports for manual validation or in-memory DB
 // import { PostInputDtoValidation } from "../../validation/PostInputDtoValidation";
 // import { createErrorMessages } from "../../../core/utils/error.utils";
@@ -38,7 +38,7 @@ res) => __awaiter(void 0, void 0, void 0, function* () {
     // Use the postsRepository to create the new post in MongoDB.
     // The repository handles assigning _id, createdAt, and fetching blogName.
     try {
-        const newPost = yield posts_repository_1.postsRepository.create({
+        const newPost = yield posts_services_1.postsServices.create({
             title,
             shortDescription,
             content,

@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getByIdPost = void 0;
-const posts_repository_1 = require("../../repositories/posts.repository"); // Import your postsRepository
+const posts_services_1 = require("../../application/posts.services"); // Import your postsRepository
 // We no longer need these as we're using MongoDB and express-validator middleware
 // import {db} from "../../../db/in-memory.db";
 // import {createErrorMessages} from "../../../core/utils/error.utils"
@@ -20,10 +20,10 @@ req, // Type req.params.id
 res) => __awaiter(void 0, void 0, void 0, function* () {
     const postId = req.params.id; // This 'id' is a string representing a MongoDB ObjectId
     // Fetch the post from MongoDB using the repository
-    const post = yield posts_repository_1.postsRepository.findById(postId);
+    const post = yield posts_services_1.postsServices.findByIdorFail(postId);
     if (!post) {
         // If the post is not found, send a 404 response
-        res.sendStatus(404); // Using sendStatus is concise for common status codes
+        res.sendStatus(404); // Using sendStatus is concise for common tsatus codes
         return;
     }
     // If the post is found, send it with a 200 status

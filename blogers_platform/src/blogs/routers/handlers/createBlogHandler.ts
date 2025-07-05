@@ -2,7 +2,8 @@
 
 import { Request, Response } from 'express';
 import { BlogInputDto } from '../../dto/blog.input-dto'; // Import your DTO
-import { bloggersRepository } from '../../repositories/bloggers.repository'; // Import your bloggersRepository
+import { bloggersRepository } from '../../repositories/bloggers.repository';
+import {blogsServices} from "../../application/blogs.services"; // Import your bloggersRepository
 
 // We no longer need these imports for manual validation or the in-memory DB
 // import { db } from "../../../db/in-memory.db";
@@ -24,7 +25,7 @@ export const createBlogHandler = async ( // Make the function async
     try {
         // Use the bloggersRepository to create the new blog in MongoDB.
         // The repository handles assigning _id, createdAt, and isMembership.
-        const newBlog = await bloggersRepository.create({
+        const newBlog = await blogsServices.create({
             name,
             description,
             websiteUrl

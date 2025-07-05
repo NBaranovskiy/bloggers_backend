@@ -1,21 +1,22 @@
 import { Blogger } from '../types/blogger';
-import { BlogInputDto } from '../dto/blog.input-dto';
+import { BlogInputDto, BlogQueryDto } from '../dto/blog.input-dto';
 import {bloggersCollection, postsCollection} from '../../db/mongo.db';
 import { ObjectId, WithId } from 'mongodb';
 import {PostInputDto} from "../../posts/dto/post.input-dto";
 
 export const bloggersRepository = {
-  async findAll(): Promise<Blogger[]> { // Возвращаем Blogger[], а не WithId<Blogger>[]
-    const bloggers = await bloggersCollection.find().toArray();
-    // Преобразуем _id в id для каждого блогера
-    return bloggers.map(b => ({
-      ...b,
-      id: b._id.toString(), // Преобразуем ObjectId в строку для поля id
-      _id: undefined // Удаляем _id, если он не нужен в конечном объекте
-    })) as Blogger[]; // Приводим к Blogger[]
-  },
-
-  async findById(id: string): Promise<Blogger | null> { // Возвращаем Blogger, а не WithId<Blogger>
+    async findAll(queryDto: BlogQueryDto): Promise<{ items: Blogger[]; totalCount: number }> {
+      const bloggersFromDb: Blogger[] = await bloggersCollection.find({}).toArray();
+      const items: Blogger[] = bloggersFromDb.map(b => ({
+        ...b, // Копируем все существующие поля (name, description, websiteUrl, createdAt, isMembership)
+        id: b._id ? b._id.toString() : b.id // Если есть _id, преобразуем его, иначе используем уже существующий id
+      }));
+      return {
+        items: items,
+        totalCount: items.length // Пока totalCount равен количеству полученных элементов
+      };
+    },
+    async findById(id: string): Promise<Blogger | null> { // Возвращаем Blogger, а не WithId<Blogger>
     if (!ObjectId.isValid(id)) {
       return null;
     }
@@ -61,8 +62,6 @@ export const bloggersRepository = {
     return updateResult.modifiedCount  > 0;
   },
 
-
-
   async delete(id: string): Promise<boolean> {
     if (!ObjectId.isValid(id)) {
       return false;
@@ -71,3 +70,4 @@ export const bloggersRepository = {
     return deleteResult.deletedCount > 0;
   },
 };
+

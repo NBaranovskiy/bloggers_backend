@@ -22,7 +22,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createBlogHandler = void 0;
-const bloggers_repository_1 = require("../../repositories/bloggers.repository"); // Import your bloggersRepository
+const blogs_services_1 = require("../../application/blogs.services"); // Import your bloggersRepository
 // We no longer need these imports for manual validation or the in-memory DB
 // import { db } from "../../../db/in-memory.db";
 // import { BlogInputDtoValidation } from "../../validation/BlogInputDtoValidation";
@@ -39,7 +39,7 @@ res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Use the bloggersRepository to create the new blog in MongoDB.
         // The repository handles assigning _id, createdAt, and isMembership.
-        const newBlog = yield bloggers_repository_1.bloggersRepository.create({
+        const newBlog = yield blogs_services_1.blogsServices.create({
             name,
             description,
             websiteUrl

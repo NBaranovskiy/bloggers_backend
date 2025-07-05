@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBloggerHandler = void 0;
-const bloggers_repository_1 = require("../../repositories/bloggers.repository");
+const blogs_services_1 = require("../../application/blogs.services");
 // We no longer need the in-memory database or createErrorMessages
 // import {db} from "../../../db/in-memory.db";
 // import {createErrorMessages} from "../../../core/utils/error.utils";
@@ -19,7 +19,7 @@ const deleteBloggerHandler = (// Make the function async
 req, // Type req.params.id for clarity
 res) => __awaiter(void 0, void 0, void 0, function* () {
     const blogId = req.params.id;
-    const isDeleted = yield bloggers_repository_1.bloggersRepository.delete(blogId); // Получаем boolean
+    const isDeleted = yield blogs_services_1.blogsServices.delete(blogId); // Получаем boolean
     if (!isDeleted) {
         res.sendStatus(404); // Пост не найден
         return;

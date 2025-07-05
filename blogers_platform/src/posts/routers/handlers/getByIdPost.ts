@@ -1,7 +1,8 @@
 // src/routers/handlers/getByIdPost.ts
 
 import { Request, Response } from 'express';
-import { postsRepository } from '../../repositories/posts.repository'; // Import your postsRepository
+import { postsRepository } from '../../repositories/posts.repository';
+import {postsServices} from "../../application/posts.services"; // Import your postsRepository
 
 // We no longer need these as we're using MongoDB and express-validator middleware
 // import {db} from "../../../db/in-memory.db";
@@ -14,11 +15,11 @@ export const getByIdPost = async ( // Make the function async
     const postId = req.params.id; // This 'id' is a string representing a MongoDB ObjectId
 
     // Fetch the post from MongoDB using the repository
-    const post = await postsRepository.findById(postId);
+    const post = await postsServices.findByIdorFail(postId);
 
     if (!post) {
         // If the post is not found, send a 404 response
-        res.sendStatus(404); // Using sendStatus is concise for common status codes
+        res.sendStatus(404); // Using sendStatus is concise for common tsatus codes
         return;
     }
 

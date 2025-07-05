@@ -2,6 +2,7 @@
 
 import { Request, Response } from 'express';
 import { bloggersRepository } from '../../repositories/bloggers.repository';
+import {blogsServices} from "../../application/blogs.services";
 
 // We no longer need the in-memory database or createErrorMessages
 // import {db} from "../../../db/in-memory.db";
@@ -14,7 +15,7 @@ export const deleteBloggerHandler = async ( // Make the function async
 
     const blogId = req.params.id;
 
-    const isDeleted = await bloggersRepository.delete(blogId); // Получаем boolean
+    const isDeleted = await blogsServices.delete(blogId); // Получаем boolean
 
     if (!isDeleted) {
         res.sendStatus(404); // Пост не найден

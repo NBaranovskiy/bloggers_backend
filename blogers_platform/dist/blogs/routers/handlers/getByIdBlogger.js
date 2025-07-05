@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getByIdBlogger = void 0;
-const bloggers_repository_1 = require("../../repositories/bloggers.repository"); // Import your bloggersRepository
+const blogs_services_1 = require("../../application/blogs.services"); // Import your bloggersRepository
 // We no longer need these imports for the in-memory DB or manual error messages
 // import {db} from "../../../db/in-memory.db";
 // import {createErrorMessages} from "../../../core/utils/error.utils"
@@ -20,7 +20,7 @@ req, // Type req.params.id
 res) => __awaiter(void 0, void 0, void 0, function* () {
     const bloggerId = req.params.id; // This 'id' is a string representing a MongoDB ObjectId
     // Fetch the blogger from MongoDB using the repository
-    const blogger = yield bloggers_repository_1.bloggersRepository.findById(bloggerId);
+    const blogger = yield blogs_services_1.blogsServices.findByIdorFail(bloggerId);
     if (!blogger) {
         // If the blogger is not found, send a 404 response
         res.sendStatus(404); // Using sendStatus is concise for common status codes
