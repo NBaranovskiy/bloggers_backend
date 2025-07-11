@@ -61,13 +61,13 @@ export const createPostForBlogHandler = async (
     try {
         // 4. **Вызываем сервисный метод для создания поста.**
         const createdPost: Post = await postsServices.create(newPostData);
-
+        const {_id, ...postWithoutId} = createdPost
         // 5. **Отправляем успешный ответ со статусом 201 Created.**
-        res.status(201).json(createdPost);
+        res.status(201).json(postWithoutId);
     } catch (error) {
         // 6. **Обработка ошибок при создании поста (если не связаны с blogId).**
         console.error("Error creating post for blog:", error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(404).json({ message: "Internal server error" });
     }
 };
 

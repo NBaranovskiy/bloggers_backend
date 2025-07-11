@@ -25,10 +25,11 @@ export const bloggersRepository = {
       return null;
     }
     // Преобразуем _id в id при получении одного блогера
+    const { _id, ...restOfBlogger } = blogger; // Извлекаем _id и собираем остальное в restOfBlogger
+
     return {
-      ...blogger,
-      id: blogger._id.toString(),
-      _id: undefined // Удаляем _id
+      ...restOfBlogger, // Распространяем все остальные свойства
+      id: _id.toString() // Добавляем новое свойство 'id'
     } as Blogger;
   },
 

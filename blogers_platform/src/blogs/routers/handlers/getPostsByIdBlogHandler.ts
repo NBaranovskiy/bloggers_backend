@@ -21,7 +21,7 @@ export const getPostsByIdBlogHandler = async (
         if (error.message.includes("not found")) {
             res.status(404).json({ message: `Blog with ID ${blogId} not found.` });
         }
-            res.status(500).json({ message: "Internal server error" });
+            res.status(404).json({ message: "Internal server error" });
     }
 
     // 2. Извлекаем параметры запроса из req.query и добавляем blogId
