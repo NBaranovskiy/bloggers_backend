@@ -1,74 +1,119 @@
 import { Blogger } from '../types/blogger';
 import { BlogInputDto, BlogQueryDto } from '../dto/blog.input-dto';
-import {bloggersCollection, postsCollection} from '../../db/mongo.db';
-import { ObjectId, WithId } from 'mongodb';
-import {PostInputDto} from "../../posts/dto/post.input-dto";
+import { bloggersCollection } from '../../db/mongo.db'; // Предполагается, что postsCollection здесь не используется
+import { ObjectId } from 'mongodb';
 
 export const bloggersRepository = {
+    /**
+     * Возвращает список блогеров с пагинацией и фильтрацией.
+     * Преобразует `_id` в `id` и удаляет `_id` из конечного объекта.
+     * @param queryDto Параметры запроса для фильтрации и пагинации.
+     * @returns Объект с массивом блогеров и общим количеством.
+     */
     async findAll(queryDto: BlogQueryDto): Promise<{ items: Blogger[]; totalCount: number }> {
-      const bloggersFromDb: Blogger[] = await bloggersCollection.find({}).toArray();
-      const items: Blogger[] = bloggersFromDb.map(b => ({
-        ...b, // Копируем все существующие поля (name, description, websiteUrl, createdAt, isMembership)
-        id: b._id ? b._id.toString() : b.id // Если есть _id, преобразуем его, иначе используем уже существующий id
-      }));
+      // Получаем блогеров из базы данных
+      const bloggersFromDb = await bloggersCollection.find({}).toArray();
+
+      // Преобразуем каждый объект блогера: удаляем _id и добавляем id
+      const items: Blogger[] = bloggersFromDb.map(b => {
+        const { _id, ...restOfBlogger } = b; // Деструктурируем: извлекаем _id, остальное в restOfBlogger
+        return {
+          ...restOfBlogger, // Распространяем все остальные свойства
+          id: _id.toString() // Добавляем новое свойство 'id' из _id
+        } as Blogger;
+      });
+
+      // В реальном приложении здесь должна быть логика пагинации и подсчета общего количества
+      // с учетом фильтров. Для текущего примера возвращаем все найденные элементы.
       return {
         items: items,
-        totalCount: items.length // Пока totalCount равен количеству полученных элементов
+        totalCount: await bloggersCollection.countDocuments({}) // Получаем фактическое общее количество документов
       };
     },
-    async findById(id: string): Promise<Blogger | null> { // Возвращаем Blogger, а не WithId<Blogger>
-    if (!ObjectId.isValid(id)) {
-      return null;
-    }
-    const blogger = await bloggersCollection.findOne({ _id: new ObjectId(id) });
-    if (!blogger) {
-      return null;
-    }
-    // Преобразуем _id в id при получении одного блогера
-    const { _id, ...restOfBlogger } = blogger; // Извлекаем _id и собираем остальное в restOfBlogger
 
-    return {
-      ...restOfBlogger, // Распространяем все остальные свойства
-      id: _id.toString() // Добавляем новое свойство 'id'
-    } as Blogger;
-  },
+    /**
+     * Находит блогера по его ID.
+     * Преобразует `_id` в `id` и удаляет `_id` из конечного объекта.
+     * @param id Строковый ID блогера.
+     * @returns Объект блогера или null, если не найден.
+     */
+    async findById(id: string): Promise<Blogger | null> {
+      // Проверяем валидность ObjectId
+      if (!ObjectId.isValid(id)) {
+        return null;
+      }
+      // Находим блогера по _id
+      const blogger = await bloggersCollection.findOne({ _id: new ObjectId(id) });
+      if (!blogger) {
+        return null; // Если блогер не найден, возвращаем null
+      }
 
-  async create(dto: BlogInputDto): Promise<Blogger> { // Возвращаем Blogger, а не WithId<Blogger>
-    const newBloggerData = { // Создаем объект без _id, так как он будет добавлен MongoDB
-      name: dto.name,
-      description: dto.description,
-      websiteUrl: dto.websiteUrl,
-      createdAt: new Date().toISOString(),
-      isMembership: false
-    };
+      // Деструктурируем объект: извлекаем _id, остальное в restOfBlogger
+      const { _id, ...restOfBlogger } = blogger;
 
-    const insertResult = await bloggersCollection.insertOne(newBloggerData);
+      // Возвращаем новый объект с id вместо _id
+      return {
+        ...restOfBlogger, // Распространяем все остальные свойства
+        id: _id.toString() // Добавляем новое свойство 'id'
+      } as Blogger;
+    },
 
-    // Возвращаем объект, который соответствует ожиданиям тестов (с полем `id`)
-    return {
-      ...newBloggerData,
-      id: insertResult.insertedId.toString(), // Используем _id от MongoDB как ваш id
-      _id: undefined // Опционально: если вы не хотите видеть _id в возвращаемом объекте
-    } as Blogger;
-  },
+    /**
+     * Создает нового блогера.
+     * Возвращает созданного блогера с `id` полем, но без `_id`.
+     * @param dto Объект с данными для создания блогера.
+     * @returns Созданный объект блогера.
+     */
+    async create(dto: BlogInputDto): Promise<Blogger> {
+      const newBloggerData = {
+        name: dto.name,
+        description: dto.description,
+        websiteUrl: dto.websiteUrl,
+        createdAt: new Date().toISOString(),
+        isMembership: false
+      };
 
-  async update(id: string, dto: BlogInputDto): Promise<boolean> {
-    if (!ObjectId.isValid(id)) {
-      return false;
-    }
-    const updateResult = await bloggersCollection.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { name: dto.name, description: dto.description, websiteUrl: dto.websiteUrl } },
-    );
-    return updateResult.modifiedCount  > 0;
-  },
+      // Вставляем нового блогера в коллекцию
+      const insertResult = await bloggersCollection.insertOne(newBloggerData);
 
-  async delete(id: string): Promise<boolean> {
-    if (!ObjectId.isValid(id)) {
-      return false;
-    }
-    const deleteResult = await bloggersCollection.deleteOne({ _id: new ObjectId(id) });
-    return deleteResult.deletedCount > 0;
-  },
+      // Возвращаем объект, который соответствует ожиданиям тестов (с полем `id` и без `_id`)
+      return {
+        ...newBloggerData, // Распространяем все поля из newBloggerData
+        id: insertResult.insertedId.toString(), // Используем _id от MongoDB как ваш id
+      } as Blogger; // Приводим к типу Blogger (который не содержит _id)
+    },
+
+    /**
+     * Обновляет данные существующего блогера по ID.
+     * @param id Строковый ID блогера.
+     * @param dto Объект с обновленными данными блогера.
+     * @returns true, если блогер был обновлен, иначе false.
+     */
+    async update(id: string, dto: BlogInputDto): Promise<boolean> {
+      // Проверяем валидность ObjectId
+      if (!ObjectId.isValid(id)) {
+        return false;
+      }
+      // Обновляем блогера в коллекции
+      const updateResult = await bloggersCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { name: dto.name, description: dto.description, websiteUrl: dto.websiteUrl } },
+      );
+      return updateResult.modifiedCount > 0; // Возвращаем true, если был изменен хотя бы один документ
+    },
+
+    /**
+     * Удаляет блогера по ID.
+     * @param id Строковый ID блогера.
+     * @returns true, если блогер был удален, иначе false.
+     */
+    async delete(id: string): Promise<boolean> {
+      // Проверяем валидность ObjectId
+      if (!ObjectId.isValid(id)) {
+        return false;
+      }
+      // Удаляем блогера из коллекции
+      const deleteResult = await bloggersCollection.deleteOne({ _id: new ObjectId(id) });
+      return deleteResult.deletedCount > 0; // Возвращаем true, если был удален хотя бы один документ
+    },
 };
-

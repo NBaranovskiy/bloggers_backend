@@ -61,7 +61,7 @@ const handleValidationErrors = (req, res, next) => {
                 field: field
             };
         });
-        res.status(400).json({ errorsMessages: formattedErrors });
+        res.status(404).json({ errorsMessages: formattedErrors });
         return;
     }
     return next();
