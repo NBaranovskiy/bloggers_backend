@@ -6,7 +6,6 @@ import { updateBloggerHandler } from "./handlers/updateBloggerHandler";
 import { deleteBloggerHandler } from "./handlers/deleteBloggerHandler";
 import { createPostForBlogHandler } from "./handlers/createPostForBlogHandler";
 import { superAdminGuardMiddleware } from '../../auth/middlewares/super-admin.guard-middleware';
-
 // Import your validation middleware
 import {
     blogInputValidation,
@@ -33,13 +32,14 @@ blogRouter
         '/:blogId/posts',
         mongoIdValidation,
         handleValidationErrors,
-        getPostsByIdBlogHandler
+        getPostsByIdBlogHandler,
     )
 
     .post(
         '/:blogId/posts',
         superAdminGuardMiddleware,
         postInputValidation,
+        handleValidationErrors, // <--- ДОБАВЛЕНО: Обработка ошибок валидации для POST /blogs/:blogId/posts
         createPostForBlogHandler
     )
 

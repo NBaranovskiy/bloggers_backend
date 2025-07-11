@@ -4,42 +4,53 @@ import { Post } from "../../../posts/types/post";
 import { blogsServices } from "../../application/blogs.services";
 import { postsServices } from "../../../posts/application/posts.services";
 
-
 // GET /blogs/:blogId/posts - Получить все посты для конкретного блога с пагинацией и фильтрацией
 export const getPostsByIdBlogHandler = async (
     req: Request<{ blogId: string }, {}, {}, PostsQueryDto>,
     res: Response<Paged<Post> | { message: string }>
 ) => {
-    const blogId = req.params.blogId;
+    const blogId = req.params.blogId; // Получаем blogId из параметров URL
 
     // 1. Проверяем существование блога
     try {
-        await blogsServices.findByIdorFail(blogId);
-    } catch (error: any) {
-        // If blog is not found (or specific "not found" error), return 404
-        if (error.message.includes("not found")) {
-            return res.status(404).json({ message: `Blog with ID ${blogId} not found.` });
+        // blogsServices.findByIdorFail должен выбрасывать ошибку, если блог не найден
+        const blog = await blogsServices.findByIdorFail(blogId);
+        if (!blog) { // Дополнительная проверка, если findByIdorFail может вернуть null
+            res.status(404).json({ message: `Blog with ID ${blogId} not found.` });
+            return; // ИСПРАВЛЕНИЕ: Просто return; без возврата res
         }
-        // For any other unexpected error during blog lookup, return 500
-        console.error("Error checking blog existence:", error); // Log the actual error
-        return res.status(500).json({ message: "Internal server error during blog check." });
+    } catch (error: any) {
+        // Если блог не найден (ошибка, содержащая "not found"), возвращаем 404
+        if (error.message && error.message.includes("not found")) {
+            res.status(404).json({ message: `Blog with ID ${blogId} not found.` });
+            return; // ИСПРАВЛЕНИЕ: Просто return; без возврата res
+        }
+        // Для любых других неожиданных ошибок при проверке существования блога, возвращаем 500
+        console.error("Error checking blog existence:", error);
+        res.status(500).json({ message: "Internal server error during blog check." });
+        return; // ИСПРАВЛЕНИЕ: Просто return; без возврата res
     }
 
     // 2. Извлекаем параметры запроса из req.query и добавляем blogId
     const queryDto: PostsQueryDto = {
-        blogId: blogId,
+        blogId: blogId, // <-- Ключевое изменение: передаем blogId для фильтрации
         searchNameTerm: req.query.searchNameTerm ? String(req.query.searchNameTerm) : undefined,
         searchContentTerm: req.query.searchContentTerm ? String(req.query.searchContentTerm) : undefined,
         pageNumber: req.query.pageNumber ? Number(req.query.pageNumber) : undefined,
         pageSize: req.query.pageSize ? Number(req.query.pageSize) : undefined,
+        sortBy: req.query.sortBy ? String(req.query.sortBy) : undefined, // Добавляем sortBy
+        sortDirection: req.query.sortDirection ? String(req.query.sortDirection) : undefined, // Добавляем sortDirection
     };
 
-    // 3. Базовая валидация параметров пагинации
-    if (queryDto.pageNumber && isNaN(queryDto.pageNumber)) {
-        return res.status(400).json({ message: "pageNumber must be a number." }); // Changed 404 to 400 for bad input
+    // 3. Базовая валидация параметров пагинации (перемещена в начало, чтобы избежать лишних вызовов сервисов)
+    // Эти проверки должны быть в мидлваре валидации, но если их нет, то здесь.
+    if (queryDto.pageNumber && (isNaN(queryDto.pageNumber) || queryDto.pageNumber < 1)) {
+        res.status(400).json({ message: "pageNumber must be a positive number." });
+        return; // ИСПРАВЛЕНИЕ: Просто return; без возврата res
     }
-    if (queryDto.pageSize && isNaN(queryDto.pageSize)) {
-        return res.status(400).json({ message: "pageSize must be a number." }); // Changed 404 to 400 for bad input
+    if (queryDto.pageSize && (isNaN(queryDto.pageSize) || queryDto.pageSize < 1)) {
+        res.status(400).json({ message: "pageSize must be a positive number." });
+        return; // ИСПРАВЛЕНИЕ: Просто return; без возврата res
     }
 
     try {
@@ -47,9 +58,11 @@ export const getPostsByIdBlogHandler = async (
         const result: Paged<Post> = await postsServices.findAll(queryDto);
 
         // 5. Отправляем успешный ответ
-        return res.status(200).json(result);
+        res.status(200).json(result);
+        return; // ИСПРАВЛЕНИЕ: Просто return; без возврата res
     } catch (error) {
         console.error("Error fetching posts for blog:", error);
-        return res.status(500).json({ message: "Internal server error during post fetch." });
+        res.status(500).json({ message: "Internal server error during post fetch." });
+        return; // ИСПРАВЛЕНИЕ: Просто return; без возврата res
     }
 };
