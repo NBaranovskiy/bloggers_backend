@@ -32,7 +32,7 @@ export const createPostForBlogHandler = async (
     }
 
     if (errors.length > 0) {
-        res.status(400).json({ errorsMessages: errors });
+        res.status(404).json({ errorsMessages: errors });
     }
 
     // 2. **Проверка существования блога по blogId.**
