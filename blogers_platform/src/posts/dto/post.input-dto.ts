@@ -12,6 +12,8 @@ export type PostsQueryDto = {
     blogId?: string; // Для фильтрации постов по ID блога
     pageNumber?: number;
     pageSize?: number;
+    sortDirection?: string;
+    sortBy?: string;
     // sortBy и sortDirection удалены
 };
 

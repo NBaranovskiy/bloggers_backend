@@ -1,6 +1,6 @@
-import { body, param, validationResult,ValidationError  } from 'express-validator';
+import { body, param, validationResult, ValidationError } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
-import { bloggersRepository } from '../../blogs/repositories/bloggers.repository';
+// import { bloggersRepository } from '../../blogs/repositories/bloggers.repository'; // Не используется в этом файле
 // import { BlogInputDto } from '../dto/blog.input-dto'; // Если нужна сама DTO для типизации, но для валидации она не обязательна
 
 // Определение паттерна для URL (или можно использовать встроенный isURL от express-validator)
@@ -49,7 +49,6 @@ export const mongoIdValidation = [
     .withMessage('Blog ID must be a string').bail()
     .isMongoId() // Проверяет, является ли строка корректным MongoDB ObjectId
     .withMessage('Incorrect format of Blog ID').bail()
-
 ];
 
 // --- Обработчик ошибок валидации ---
@@ -58,30 +57,27 @@ export const mongoIdValidation = [
  * Middleware для обработки результатов валидации express-validator.
  * Если есть ошибки, отправляет ответ со статусом 400 и отформатированными ошибками.
  */
-
 export const handleValidationErrors = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    // LAST RESORT: Cast to 'any' if 'param' and 'path' are both not recognized
     const formattedErrors = errors.array().map((error: any) => {
-      const field = error.param || error.path || ''; // Try both, fallback to empty
+      // Используем 'path' как более универсальное поле, если 'param' не всегда доступен
+      const field = error.path || error.param || '';
       return {
         message: error.msg,
         field: field
       };
-
     });
-    res.status(404).json({ errorsMessages: formattedErrors });
-    return;
+    // ИЗМЕНЕНИЕ ЗДЕСЬ: Возвращаем 400 (Bad Request) вместо 404
+    res.status(400).json({ errorsMessages: formattedErrors });
+    return; // Важно вернуть, чтобы остановить выполнение запроса
   }
-  return next();
+  return next(); // Если ошибок нет, передаем управление следующему middleware/обработчику
 };
-// --- Объединение в один пакет для экспорта (опционально, но удобно) ---
 
-// Если вы хотите экспортировать всё из одного места, можно сделать так:
+// --- Объединение в один пакет для экспорта (опционально, но удобно) ---
 export const validationMiddleware = {
   blogInputValidation,
   mongoIdValidation,
   handleValidationErrors,
 };
-

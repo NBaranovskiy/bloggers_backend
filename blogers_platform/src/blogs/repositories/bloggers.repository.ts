@@ -1,6 +1,6 @@
 import { Blogger } from '../types/blogger';
 import { BlogInputDto, BlogQueryDto } from '../dto/blog.input-dto';
-import { bloggersCollection } from '../../db/mongo.db'; // Предполагается, что postsCollection здесь не используется
+import { bloggersCollection } from '../../db/mongo.db';
 import { ObjectId } from 'mongodb';
 
 export const bloggersRepository = {
@@ -10,24 +10,47 @@ export const bloggersRepository = {
      * @param queryDto Параметры запроса для фильтрации и пагинации.
      * @returns Объект с массивом блогеров и общим количеством.
      */
-    async findAll(queryDto: BlogQueryDto): Promise<{ items: Blogger[]; totalCount: number }> {
-      // Получаем блогеров из базы данных
-      const bloggersFromDb = await bloggersCollection.find({}).toArray();
+    async findAll(queryDto: BlogQueryDto): Promise<{ items: Blogger[]; totalCount: number, pagesCount: number, page: number, pageSize: number }> {
+      // Устанавливаем значения по умолчанию для пагинации и сортировки
+      const pageNumber = queryDto.pageNumber ? Number(queryDto.pageNumber) : 1;
+      const pageSize = queryDto.pageSize ? Number(queryDto.pageSize) : 10;
+      const sortBy = queryDto.sortBy || 'createdAt'; // По умолчанию сортируем по createdAt
+      const sortDirection = queryDto.sortDirection === 'asc' ? 1 : -1; // 1 для asc, -1 для desc
+      const searchNameTerm = queryDto.searchNameTerm ? String(queryDto.searchNameTerm) : undefined;
+
+      // Формируем фильтр для MongoDB
+      const filter: any = {};
+      if (searchNameTerm) {
+        filter.name = { $regex: searchNameTerm, $options: 'i' }; // Поиск по имени без учета регистра
+      }
+
+      // Получаем общее количество документов, соответствующих фильтру
+      const totalCount = await bloggersCollection.countDocuments(filter);
+      const pagesCount = Math.ceil(totalCount / pageSize);
+
+      // Получаем блогеров из базы данных с учетом пагинации, сортировки и фильтрации
+      const bloggersFromDb = await bloggersCollection
+        .find(filter)
+        .sort({ [sortBy]: sortDirection }) // Применяем сортировку
+        .skip((pageNumber - 1) * pageSize) // Пропускаем нужное количество документов
+        .limit(pageSize) // Ограничиваем количество документов на страницу
+        .toArray();
 
       // Преобразуем каждый объект блогера: удаляем _id и добавляем id
       const items: Blogger[] = bloggersFromDb.map(b => {
-        const { _id, ...restOfBlogger } = b; // Деструктурируем: извлекаем _id, остальное в restOfBlogger
+        const { _id, ...restOfBlogger } = b;
         return {
-          ...restOfBlogger, // Распространяем все остальные свойства
-          id: _id.toString() // Добавляем новое свойство 'id' из _id
+          ...restOfBlogger,
+          id: _id.toString()
         } as Blogger;
       });
 
-      // В реальном приложении здесь должна быть логика пагинации и подсчета общего количества
-      // с учетом фильтров. Для текущего примера возвращаем все найденные элементы.
       return {
         items: items,
-        totalCount: await bloggersCollection.countDocuments({}) // Получаем фактическое общее количество документов
+        totalCount: totalCount,
+        pagesCount: pagesCount,
+        page: pageNumber,
+        pageSize: pageSize
       };
     },
 

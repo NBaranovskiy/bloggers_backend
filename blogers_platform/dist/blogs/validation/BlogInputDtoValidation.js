@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validationMiddleware = exports.handleValidationErrors = exports.mongoIdValidation = exports.blogInputValidation = void 0;
 const express_validator_1 = require("express-validator");
+// import { bloggersRepository } from '../../blogs/repositories/bloggers.repository'; // Не используется в этом файле
 // import { BlogInputDto } from '../dto/blog.input-dto'; // Если нужна сама DTO для типизации, но для валидации она не обязательна
 // Определение паттерна для URL (или можно использовать встроенный isURL от express-validator)
 const websiteUrlPattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
@@ -53,22 +54,22 @@ exports.mongoIdValidation = [
 const handleValidationErrors = (req, res, next) => {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
-        // LAST RESORT: Cast to 'any' if 'param' and 'path' are both not recognized
         const formattedErrors = errors.array().map((error) => {
-            const field = error.param || error.path || ''; // Try both, fallback to empty
+            // Используем 'path' как более универсальное поле, если 'param' не всегда доступен
+            const field = error.path || error.param || '';
             return {
                 message: error.msg,
                 field: field
             };
         });
-        res.status(404).json({ errorsMessages: formattedErrors });
-        return;
+        // ИЗМЕНЕНИЕ ЗДЕСЬ: Возвращаем 400 (Bad Request) вместо 404
+        res.status(400).json({ errorsMessages: formattedErrors });
+        return; // Важно вернуть, чтобы остановить выполнение запроса
     }
-    return next();
+    return next(); // Если ошибок нет, передаем управление следующему middleware/обработчику
 };
 exports.handleValidationErrors = handleValidationErrors;
 // --- Объединение в один пакет для экспорта (опционально, но удобно) ---
-// Если вы хотите экспортировать всё из одного места, можно сделать так:
 exports.validationMiddleware = {
     blogInputValidation: exports.blogInputValidation,
     mongoIdValidation: exports.mongoIdValidation,
