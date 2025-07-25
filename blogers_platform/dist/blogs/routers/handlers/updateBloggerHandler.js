@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateBloggerHandler = void 0;
-const blogs_services_1 = require("../../application/blogs.services"); // Import your DTO
+const bloggers_repository_1 = require("../../repositories/bloggers.repository"); // Import your bloggersRepository
 // We no longer need these imports for manual validation or in-memory DB
 // import { db } from "../../../db/in-memory.db";
 // import { BlogInputDtoValidation } from "../../validation/BlogInputDtoValidation";
@@ -26,7 +26,7 @@ res) => __awaiter(void 0, void 0, void 0, function* () {
     // If there are validation errors, handleValidationErrors will already send a 400 response.
     // So, no need to run validation or check for errors here.
     const updateData = req.body;
-    const isUpdated = yield blogs_services_1.blogsServices.update(bloggerId, updateData);
+    const isUpdated = yield bloggers_repository_1.bloggersRepository.update(bloggerId, updateData);
     if (!isUpdated) {
         res.sendStatus(404);
         return;

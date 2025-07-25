@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updatePostHandler = void 0;
-const posts_services_1 = require("../../application/posts.services"); // Import your DTO
+const posts_repository_1 = require("../../repositories/posts.repository"); // Import your postsRepository
 const updatePostHandler = (// Make the function async
 req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const postId = req.params.id; // This 'id' is now a MongoDB ObjectId string
@@ -19,7 +19,7 @@ req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // is now handled by middleware *before* this handler is called.
     // So, no need to run validation or check for errors here.
     const updateData = req.body;
-    const isUpdated = yield posts_services_1.postsServices.update(postId, updateData);
+    const isUpdated = yield posts_repository_1.postsRepository.update(postId, updateData);
     if (!isUpdated) {
         res.sendStatus(404);
         return;
