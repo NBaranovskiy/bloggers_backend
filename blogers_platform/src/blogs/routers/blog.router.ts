@@ -65,4 +65,17 @@ blogRouter
         mongoIdValidation, // Validate the 'id' parameter
         handleValidationErrors, // Handle any validation errors
         deleteBloggerHandler
+    )
+    .post(
+        '/:id/posts',
+        superAdminGuardMiddleware,
+        blogInputValidation, // Apply input validation for the request body
+        handleValidationErrors, // Handle any validation errors
+        createBlogHandler
+    )
+    .get(
+        '/:id/posts',
+        mongoIdValidation, // Apply validation for the 'id' parameter
+        handleValidationErrors, // Handle any validation errors
+        getByIdBlogger
     );

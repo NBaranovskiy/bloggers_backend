@@ -31,4 +31,10 @@ BlogInputDtoValidation_1.handleValidationErrors, // Handle any validation errors
 updateBloggerHandler_1.updateBloggerHandler)
     .delete('/:id', super_admin_guard_middleware_1.superAdminGuardMiddleware, BlogInputDtoValidation_1.mongoIdValidation, // Validate the 'id' parameter
 BlogInputDtoValidation_1.handleValidationErrors, // Handle any validation errors
-deleteBloggerHandler_1.deleteBloggerHandler);
+deleteBloggerHandler_1.deleteBloggerHandler)
+    .post('/:id/posts', super_admin_guard_middleware_1.superAdminGuardMiddleware, BlogInputDtoValidation_1.blogInputValidation, // Apply input validation for the request body
+BlogInputDtoValidation_1.handleValidationErrors, // Handle any validation errors
+createBlogHandler_1.createBlogHandler)
+    .get('/:id/posts', BlogInputDtoValidation_1.mongoIdValidation, // Apply validation for the 'id' parameter
+BlogInputDtoValidation_1.handleValidationErrors, // Handle any validation errors
+getByIdBlogger_1.getByIdBlogger);
